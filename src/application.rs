@@ -83,7 +83,7 @@ impl Application {
         {
             let mut docs_worker_sender = docs_worker_sender.clone();
             let mut connection = db_pool.acquire().await?;
-            crate::utils::db::in_transaction(&mut connection, |transaction| async move {
+            in_transaction(&mut connection, |transaction| async move {
                 let app = Database::new(transaction);
                 let jobs = app.get_undocumented_crates().await?;
                 for job in jobs {

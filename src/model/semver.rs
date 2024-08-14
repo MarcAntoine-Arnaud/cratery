@@ -31,7 +31,7 @@ mod semver_version_serializer {
     /// Return a deserialization error from serde.
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<semver::Version, D::Error> {
         let text: String = Deserialize::deserialize(deserializer)?;
-        text.parse().map_err(D::Error::custom)
+        text.parse().map_err(Error::custom)
     }
 }
 
@@ -57,7 +57,7 @@ mod semver_version_req_serializer {
     /// Return a deserialization error from serde.
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<semver::VersionReq, D::Error> {
         let text: String = Deserialize::deserialize(deserializer)?;
-        text.parse().map_err(D::Error::custom)
+        text.parse().map_err(Error::custom)
     }
 }
 

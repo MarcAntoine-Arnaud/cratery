@@ -661,7 +661,7 @@ pub async fn index_serve_info_refs(
     index_serve_check_auth(&state.application, &auth_data).await?;
     let index = state.application.index.lock().await;
 
-    if query.get("service").map(std::string::String::as_str) == Some("git-upload-pack") {
+    if query.get("service").map(String::as_str) == Some("git-upload-pack") {
         // smart server response
         let data = index.get_upload_pack_info_refs().await.map_err(map_err)?;
         Ok((
