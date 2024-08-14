@@ -21,6 +21,7 @@ use tokio::fs::File;
 use tokio::io::{AsyncRead, BufReader, ReadBuf};
 
 use crate::utils::apierror::ApiError;
+use crate::utils::hashes::sha256;
 
 /// The S3 parameters
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -68,7 +69,7 @@ pub async fn list_all_buckets(params: &S3Params) -> Result<Vec<String>, ApiError
     let target = params.service_uri();
     let mut headers = HeaderMap::new();
     headers.insert(reqwest::header::HOST, HeaderValue::from_str(&target).unwrap());
-    signing::sign_request(params, "GET", "/", &[], &mut headers, &signing::sha256(b""));
+    signing::sign_request(params, "GET", "/", &[], &mut headers, &sha256(b""));
     let response = reqwest::Client::default()
         .get(format!("https://{target}/"))
         .headers(headers)
@@ -186,7 +187,7 @@ pub async fn upload_object_raw(params: &S3Params, bucket: &str, object: &str, co
 ///
 /// Return an `ApiError` when the request fails
 pub async fn get_object(params: &S3Params, bucket: &str, object: &str) -> Result<Vec<u8>, ApiError> {
-    let content_hash = signing::sha256(b"");
+    let content_hash = sha256(b"");
     let target = params.bucket_uri(bucket);
     let mut headers = HeaderMap::new();
     headers.insert(reqwest::header::HOST, HeaderValue::from_str(&target).unwrap());
