@@ -59,7 +59,7 @@ impl Index {
         Ok(index)
     }
 
-    /// Intializes the index at the specified location
+    /// Initializes the index at the specified location
     async fn initialize_index(&self, location: PathBuf) -> Result<(), ApiError> {
         if let Some(remote_origin) = &self.config.remote_origin {
             // attempts to clone
@@ -75,7 +75,7 @@ impl Index {
         Ok(())
     }
 
-    /// Intializes an empty index at the specified location
+    /// Initializes an empty index at the specified location
     async fn initialize_empty_index(&self, location: PathBuf) -> Result<(), ApiError> {
         // initialise an empty repo
         info!("index: initializing empty index");
@@ -133,7 +133,7 @@ impl Index {
         Ok(response)
     }
 
-    /// Gets the response for a upload pack request
+    /// Gets the response for an upload pack request
     pub async fn get_upload_pack_for(&self, input: &[u8]) -> Result<Vec<u8>, ApiError> {
         let location = PathBuf::from(&self.config.location);
         execute_at_location(&location, "git-upload-pack", &["--stateless-rpc", ".git"], input).await

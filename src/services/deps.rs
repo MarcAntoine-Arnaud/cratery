@@ -240,7 +240,7 @@ pub struct DepsChecker<'a> {
 
 /// The URI identifying crates.io as the registry for a dependency
 const CRATES_IO_REGISTRY_URI: &str = "https://github.com/rust-lang/crates.io-index";
-/// The prefixs URI for the index for dependencies on crates.io
+/// The prefixes URI for the index for dependencies on crates.io
 const _CRATES_IO_INDEX_SPARSE_URI: &str = "https://index.crates.io/";
 /// Registry name for crates.io
 const CRATES_IO_NAME: &str = "crates.io";
@@ -342,7 +342,7 @@ impl<'a> DepsChecker<'a> {
                 Err(specialize(error_not_found(), format!("Unknown registry: {registry}")))
             }
         } else {
-            // same registry, lookup in internal intex
+            // same registry, lookup in internal index
             self.index.lock().await.get_crate_data(name).await
         }
     }

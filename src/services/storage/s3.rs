@@ -11,7 +11,7 @@ use crate::model::cargo::CrateMetadata;
 use crate::utils::apierror::ApiError;
 use crate::utils::s3::S3Params;
 
-/// An storage implementation that uses S3
+/// Storage implementation that uses S3
 pub struct S3Storage<'config> {
     /// The S3 connection parameters
     params: &'config S3Params,

@@ -10,7 +10,7 @@ use super::Storage;
 use crate::model::cargo::CrateMetadata;
 use crate::utils::apierror::{error_not_found, ApiError};
 
-/// An storage implementation that uses the file system
+/// Storage implementation that uses the file system
 pub struct FsStorage<'config> {
     /// The data directory in the configuration
     data_dir: &'config str,
