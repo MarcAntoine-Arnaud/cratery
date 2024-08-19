@@ -4,6 +4,7 @@
 
 //! Docs generation and management
 
+use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
@@ -20,7 +21,6 @@ use crate::model::config::Configuration;
 use crate::model::JobCrate;
 use crate::services::database::Database;
 use crate::services::storage;
-use crate::services::storage::Storage;
 use crate::utils::apierror::{error_backend_failure, specialize, ApiError};
 use crate::utils::concurrent::n_at_a_time;
 use crate::utils::db::in_transaction;
@@ -44,9 +44,10 @@ pub fn create_docs_worker(configuration: Arc<Configuration>, pool: Pool<Sqlite>)
 /// Executes a documentation generation job
 async fn docs_worker_job(configuration: Arc<Configuration>, pool: &Pool<Sqlite>, job: JobCrate) -> Result<(), ApiError> {
     info!("generating doc for {} {}", job.name, job.version);
-    let content = storage::get_storage(&configuration)
-        .download_crate(&job.name, &job.version)
-        .await?;
+    let backend_storage = storage::Storage::from(&configuration.deref().clone());
+
+    let content = backend_storage.download_crate(&job.name, &job.version).await?;
+
     let temp_folder = extract_content(&job.name, &job.version, &content)?;
     let gen_is_ok = match generate_doc(&configuration, &temp_folder).await {
         Ok(mut project_folder) => {
@@ -60,9 +61,7 @@ async fn docs_worker_job(configuration: Arc<Configuration>, pool: &Pool<Sqlite>,
             // upload the log
             let log = e.details.unwrap();
             let path = format!("{}/{}/log.txt", job.name, job.version);
-            storage::get_storage(&configuration)
-                .store_doc_data(&path, log.into_bytes())
-                .await?;
+            backend_storage.store_doc_data(&path, log.into_bytes()).await?;
             false
         }
     };
@@ -140,8 +139,8 @@ async fn upload_package(
     let files = upload_package_find_files(doc_folder, &format!("{name}/{version}")).await?;
     let results = n_at_a_time(
         files.into_iter().map(|(key, path)| {
-            let configuration = configuration.clone();
-            Box::pin(async move { storage::get_storage(&configuration).store_doc_file(&key, &path).await })
+            let configuration = configuration.deref().clone();
+            Box::pin(async move { storage::Storage::from(&configuration).store_doc_file(&key, &path).await })
         }),
         8,
         Result::is_err,

@@ -4,6 +4,7 @@
 
 //! Main application
 
+use std::ops::Deref;
 use std::sync::Arc;
 
 use futures::channel::mpsc::UnboundedSender;
@@ -116,8 +117,8 @@ impl Application {
     }
 
     /// Gets the storage service
-    pub fn get_service_storage(&self) -> impl Storage + '_ {
-        crate::services::storage::get_storage(&self.configuration)
+    pub fn get_service_storage(&self) -> Storage {
+        crate::services::storage::Storage::from(&self.configuration.deref().clone())
     }
 
     /// Gets the service to check for advisories using `RustSec`
